@@ -2,9 +2,8 @@
   "name": "wetube2",
   "version": "1.0.0",
   "description": "The best way to watch videos.",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "win": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +14,8 @@
   "bugs": {
     "url": "https://github.com/iam454/wetube2/issues"
   },
-  "homepage": "https://github.com/iam454/wetube2#readme"
+  "homepage": "https://github.com/iam454/wetube2#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
