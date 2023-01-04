@@ -1,0 +1,14 @@
+//- extends는 base.pug를 상속
+extends base.pug
+//- mixin 사용법
+include mixins/video.pug
+
+//- block으로 원하는 내용을 입력
+block content 
+    h2 Trending videos
+    //- 반복문 each item in items
+    each video in videos 
+        //- mixin 사용법
+        +video(video)
+    else
+        h3 Sorry, nothing found

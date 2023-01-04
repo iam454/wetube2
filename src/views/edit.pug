@@ -1,0 +1,8 @@
+extends base.pug
+
+block content 
+    h4 Change Title of video
+    //- 데이터를 가져올때 GET, 데이터를 보낼때 POST
+    form(method="POST")
+        input(name="title", placeholder="Video Title", value=video.title, required)
+        input(value="Save", type="submit")
