@@ -1,6 +1,10 @@
 extends base.pug
 
 block content 
-    h3 #{video.views} #{video.views === 1 ? "view" : "views"}
+    div
+        h2=video.description
+        small=video.createdAt
+    h4 #{video.meta.views} #{video.meta.views === 1 ? "view" : "views"}
     //- href에 /를 붙이면 절대경로, 그렇지 않으면 상대경로
     a(href=`${video.id}/edit`) Edit Video &rarr;
+    a(href=`${video.id}/delete`) Delete Video &rarr;
