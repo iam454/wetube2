@@ -1,4 +1,5 @@
 import User from "../models/User";
+import fetch from "node-fetch"; // nodejs에서 fetch를 사용하기 위해 설치
 import bcrypt from "bcrypt";
 
 // 회원가입 페이지 join.pug
@@ -68,7 +69,7 @@ export const postLogin = async (req, res) => {
   const { username, password1 } = req.body;
   const pageTitle = "Login";
   // 계정이 존재하는지 확인
-  const user = await User.findOne({ username: username });
+  const user = await User.findOne({ username: username, socialOnly: false });
   if (!user) {
     return res.status(400).render("login", {
       pageTitle,
@@ -86,4 +87,87 @@ export const postLogin = async (req, res) => {
   req.session.loggedIn = true; // 로그인한 유저가 있는 경우 session에 값을 추가
   req.session.user = user;
   res.redirect("/");
+};
+
+// github 로그인 start
+export const startGithubLogin = (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    allow_signup: false,
+    scope: "read:user user:email",
+  };
+  const params = new URLSearchParams(config).toString(); // url 깔끔하게 정리
+  const finalUrl = `${baseUrl}?${params}`;
+  return res.redirect(finalUrl);
+};
+
+// github 로그인 finish
+export const finishGithubLogin = async (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/access_token"; // github로부터 토큰을 얻어오는 과정
+  const config = {
+    client_id: process.env.GH_CLIENT,
+    client_secret: process.env.GH_SECRET,
+    code: req.query.code,
+  };
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  const tokenRequest = await (
+    await fetch(finalUrl, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+  ).json();
+  // 토큰을 얻었을때 user, email 데이터를 가져오는 과정
+  if ("access_token" in tokenRequest) {
+    const access_token = tokenRequest.access_token;
+    const apiUrl = "https://api.github.com";
+    const userData = await (
+      await fetch(`${apiUrl}/user`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    const emailObj = emailData.find(
+      (email) => email.primary === true && email.verified === true
+    );
+    // 이메일이 없다면
+    if (!emailObj) {
+      return res.redirect("/login");
+    }
+    let user = await User.findOne({ email: emailObj.email }); // 유저가 존재하는지 확인
+    if (!user) {
+      // 존재하지 않는다면 새 User를 만든다
+      user = await User.create({
+        name: userData.name ? userData.name : "Unknown",
+        avatarUrl: userData.avatar_url,
+        username: userData.login,
+        email: emailObj.email,
+        password: "",
+        socialOnly: true,
+        location: userData.location,
+      });
+    }
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
+  } else {
+    return res.redirect("/login");
+  }
+};
+
+// 로그아웃
+export const logout = (req, res) => {
+  req.session.destroy(); // 세션 종료
+  return res.redirect("/");
 };

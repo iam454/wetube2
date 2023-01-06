@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 mongoose.set("strictQuery", false); // DeprecationWarning
-mongoose.connect("mongodb://127.0.0.1:27017/wetube2");
+mongoose.connect(process.env.DB_URL);
 
 // 데이터베이스 연결 에러를 감지하도록
 const db = mongoose.connection;

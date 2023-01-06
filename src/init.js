@@ -1,4 +1,6 @@
 // 서버에 필요한 것들을 초기화
+// .env 파일에 접근하기 위해 설치 dotenv
+import "dotenv/config";
 
 // 데이터베이스 연결을 위한 import
 import "./db";

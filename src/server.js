@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan"; // 어떤 method로 어떤 url에 접근하는지 알기 위해 morgan 사용
 import session from "express-session"; // 로그인 상태를 알기 위해 session
+import MongoStore from "connect-mongo"; // mongoDB에 session값을 저장하기 위해 사용
 
 // 라우터들을 import
 import globalRouter from "./routers/rootRouter";
@@ -23,9 +24,10 @@ app.use(express.urlencoded({ extended: true })); // express가 form의 value를 
 // 로그인 유저를 알기 위한 session
 app.use(
   session({
-    secret: "Hello!",
-    resave: true,
-    saveUninitialized: true,
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false, // 세션을 수정할 때만 DB에 저장하고 쿠키를 넘겨줌
+    store: MongoStore.create({ mongoUrl: process.env.DB_URL }), // mongoDB에 저장
   })
 );
 app.use(localsMiddleware);
