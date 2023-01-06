@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan"; // 어떤 method로 어떤 url에 접근하는지 알기 위해 morgan 사용
 
 // 라우터들을 import
-import globalRouter from "./routers/globalRouter";
+import globalRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
 

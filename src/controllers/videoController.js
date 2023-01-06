@@ -12,7 +12,7 @@ export const watch = async (req, res) => {
   const id = req.params.id;
   const video = await Video.findById(id);
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
+    return res.status(404).render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
   }
   return res.render("watch", { pageTitle: video.title, video: video }); // video를 찾으면 watch.pug를 보여줌
 };
@@ -22,7 +22,7 @@ export const getEdit = async (req, res) => {
   const id = req.params.id;
   const video = await Video.findById(id);
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
+    return res.status(404).render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
   }
   return res.render("edit", {
     pageTitle: `Editing: ${video.title}`,
@@ -38,7 +38,7 @@ export const postEdit = async (req, res) => {
   const hashtags = req.body.hashtags;
   const video = await Video.exists({ _id: id }); // filter는 아무거나 가능
   if (!video) {
-    return res.render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
+    return res.status(404).render("404", { pageTitle: "Video not found" }); // video를 찾지 못하면 404.pug를 보여줌
   }
   // findByIdAndUpdate : 업데이트를 위한 함수
   await Video.findByIdAndUpdate(id, {
@@ -88,7 +88,7 @@ export const postUpload = async (req, res) => {
     });
     return res.redirect("/");
   } catch (error) {
-    return res.render("upload", {
+    return res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
     });

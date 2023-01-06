@@ -5,6 +5,8 @@ import "./db";
 
 // 비디오 모델을 사용하기 위한 import
 import "./models/Video";
+// 유저 모델을 사용하기 위한 import
+import "./models/User";
 
 // 서버 시작을 위한 import
 import app from "./server";
