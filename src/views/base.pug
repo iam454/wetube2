@@ -16,14 +16,16 @@ html(lang="ko")
                     li 
                         a(href="/") Home
                     li 
-                        a(href="/videos/upload") Upload Video
-                    li 
                         a(href="/search") Search 🔍
                     if loggedIn
                         li 
-                            a(href="/users/logout") Log out
+                            a(href="/videos/upload") Upload Video
                         li 
-                            a(href="/my-profile") #{loggedInUser.name}의 Profile
+                            a(href=`/users/${loggedInUser._id}`) #{loggedInUser.name}의 Profile
+                        li 
+                            a(href="/users/edit") Edit Profile
+                        li 
+                            a(href="/users/logout") Log out
                     else
                         li 
                             a(href="/login") Login

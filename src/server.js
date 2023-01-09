@@ -32,6 +32,9 @@ app.use(
 );
 app.use(localsMiddleware);
 
+// 노출시키고 싶은 폴더
+app.use("/uploads", express.static("uploads"));
+
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);

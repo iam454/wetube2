@@ -171,3 +171,76 @@ export const logout = (req, res) => {
   req.session.destroy(); // 세션 종료
   return res.redirect("/");
 };
+
+// 유저 프로필 수정 페이지 edit-profile.pug
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+
+// 유저 프로필 수정 post
+export const postEdit = async (req, res) => {
+  const user = req.session.user._id;
+  const avatarUrl = req.session.user.avatarUrl;
+  const { name, email, username, location } = req.body;
+  const file = req.file;
+  // 로그인된 session값을 DB와 연결해서 업데이트
+  const updatedUser = await User.findByIdAndUpdate(
+    user,
+    {
+      avatarUrl: file ? file.path : avatarUrl, // 업로드한 파일이 있으면 그걸로, 아닌 경우엔 기존값
+      name: name,
+      email: email,
+      username: username,
+      location: location,
+    },
+    { new: true }
+  );
+  req.session.user = updatedUser;
+  return res.redirect("/users/edit");
+};
+
+// 비밀번호 변경 change-password.pug
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", {
+    pageTitle: "Changing Password",
+  });
+};
+
+// 비밀번호 변경 post
+export const postChangePassword = async (req, res) => {
+  const userID = req.session.user._id;
+  const user = await User.findById(userID);
+  const { oldPassword, newPassword, newPasswordConfirmation } = req.body;
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Changing Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Changing Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+  user.password = newPassword;
+  await user.save();
+  res.redirect("/users/logout");
+};
+
+// 유저 프로필
+export const see = async (req, res) => {
+  const id = req.params.id;
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found" });
+  }
+  return res.render("users/profile", {
+    pageTitle: `${user.name}의 Profile`,
+    user: user,
+  });
+};

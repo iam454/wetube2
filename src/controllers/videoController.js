@@ -59,6 +59,7 @@ export const postUpload = async (req, res) => {
   const title = req.body.title;
   const description = req.body.description;
   const hashtags = req.body.hashtags;
+  const file = req.file;
   // 두 가지 방법
   /*
   1. new -> save
@@ -84,6 +85,7 @@ export const postUpload = async (req, res) => {
       /*
       hashtags: hashtags, // video 모델의 pre로 hashtags를 처리
       */
+      fileUrl: file.path, // 비디오 파일
       hashtags: Video.formatHashtags(hashtags),
     });
     return res.redirect("/");
